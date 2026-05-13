@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Наши клубы{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-5">Наши фитнес-клубы</h1>
+
+    <div class="row">
+        {% for club in clubs %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <!-- Фото клуба -->
+                {% if club.photo %}
+                    <img src="{{ club.photo.url }}" class="card-img-top" alt="{{ club.name }}" style="height: 250px; object-fit: cover;">
+                {% else %}
+                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 250px;">
+                        <i class="fas fa-building fa-5x"></i>
+                    </div>
+                {% endif %}
+
+                <div class="card-body">
+                    <h3 class="card-title">{{ club.name }}</h3>
+                    <p class="card-text">
+                        <i class="fas fa-map-marker-alt"></i> {{ club.address }}<br>
+                        <i class="fas fa-clock"></i> Будни: {{ club.working_hours_weekdays }}<br>
+                        <i class="fas fa-clock"></i> Выходные: {{ club.working_hours_weekend }}
+                    </p>
+
+                    <!-- Удобства клуба -->
+                    <strong>Удобства:</strong>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                {% if club.has_pool %}<li><i class="fas fa-check-circle text-success"></i> 🏊‍♂️ Бассейн</li>{% endif %}
+                                {% if club.has_parking %}<li><i class="fas fa-check-circle text-success"></i> 🅿️ Парковка</li>{% endif %}
+                                {% if club.has_towels %}<li><i class="fas fa-check-circle text-success"></i> 🧺 Полотенца</li>{% endif %}
+                                {% if club.has_restaurant %}<li><i class="fas fa-check-circle text-success"></i> 🍽️ Ресторан</li>{% endif %}
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                {% if club.has_children_room %}<li><i class="fas fa-check-circle text-success"></i> 🧸 Детская комната</li>{% endif %}
+                                {% if club.has_sauna %}<li><i class="fas fa-check-circle text-success"></i> 🔥 Сауна</li>{% endif %}
+                                {% if club.has_solarium %}<li><i class="fas fa-check-circle text-success"></i> ☀️ Солярий</li>{% endif %}
+                                {% if club.has_hammam %}<li><i class="fas fa-check-circle text-success"></i> 🧖‍♀️ Хамам</li>{% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'main:club_detail' club.pk %}" class="btn btn-primary w-100">Подробнее о клубе</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle"></i> Клубы скоро откроются. Зайдите в
+                <a href="/admin/" class="alert-link">админку</a> чтобы добавить данные.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ club.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="text-center mb-4">{{ club.name }}</h1>
+
+            <div class="card mb-4">
+                <div class="row g-0">
+                    <!-- Фото клуба -->
+                    <div class="col-md-5">
+                        {% if club.photo %}
+                            <img src="{{ club.photo.url }}" class="img-fluid rounded-start" alt="{{ club.name }}" style="height: 100%; object-fit: cover; border-radius: 15px 0 0 15px;">
+                        {% else %}
+                            <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 100%; min-height: 300px; border-radius: 15px 0 0 15px;">
+                                <i class="fas fa-building fa-8x"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-7">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h4><i class="fas fa-map-marker-alt"></i> Адрес</h4>
+                                    <p>{{ club.address }}</p>
+
+                                    <h4><i class="fas fa-clock"></i> Часы работы</h4>
+                                    <p><strong>Будни:</strong> {{ club.working_hours_weekdays }}<br>
+                                    <strong>Выходные:</strong> {{ club.working_hours_weekend }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h4><i class="fas fa-star"></i> Удобства</h4>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <ul class="list-unstyled">
+                                                {% if club.has_pool %}
+                                                    <li><i class="fas fa-check-circle text-success"></i> 🏊‍♂️ Бассейн</li>
+                                                {% endif %}
+                                                {% if club.has_parking %}
+                                                    <li><i class="fas fa-check-circle text-success"></i> 🅿️ Парковка</li>
+                                                {% endif %}
+                                                {% if club.has_towels %}
+                                                    <li><i class="fas fa-check-circle text-success"></i> 🧺 Полотенца</li>
+                                                {% endif %}
+                                                {% if club.has_restaurant %}
+                                                    <li><i class="fas fa-check-circle text-success"></i> 🍽️ Ресторан/Кафе</li>
+                                                {% endif %}
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <ul class="list-unstyled">
+                                                {% if club.has_children_room %}
+                                                    <li><i class="fas fa-check-circle text-success"></i> 🧸 Детская комната</li>
+                                                {% endif %}
+                                                {% if club.has_sauna %}
+                                                    <li><i class="fas fa-check-circle text-success"></i> 🔥 Сауна</li>
+                                                {% endif %}
+                                                {% if club.has_solarium %}
+                                                    <li><i class="fas fa-check-circle text-success"></i> ☀️ Солярий</li>
+                                                {% endif %}
+                                                {% if club.has_hammam %}
+                                                    <li><i class="fas fa-check-circle text-success"></i> 🧖‍♀️ Хамам</li>
+                                                {% endif %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <a href="{% url 'main:schedule_list' %}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-calendar-alt"></i> Расписание тренировок
+                </a>
+                <a href="{% url 'main:trainer_list' %}" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-chalkboard-user"></i> Наши тренеры
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

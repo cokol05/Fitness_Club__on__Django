@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ bio.trainer.full_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-4">
+            {% if bio.photo %}
+                <img src="{{ bio.photo.url }}" class="img-fluid rounded" alt="{{ bio.trainer.full_name }}" style="border-radius: 15px;">
+            {% else %}
+                <div class="bg-secondary text-white rounded d-flex align-items-center justify-content-center" style="height: 300px;">
+                    <i class="fas fa-user fa-8x"></i>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-md-8">
+            <h1>{{ bio.trainer.full_name }}</h1>
+            <h3 class="text-muted">{{ bio.specialty }}</h3>
+            <p><strong>Опыт работы:</strong> {{ bio.experience_years }} лет</p>
+            <p><strong>Телефон:</strong> {{ bio.trainer.phone }}</p>
+            <p><strong>Email:</strong> {{ bio.trainer.email }}</p>
+
+            {% if bio.bio %}
+                <hr>
+                <h4>О себе</h4>
+                <p>{{ bio.bio }}</p>
+            {% endif %}
+
+            {% if bio.achievements %}
+                <h4>Достижения</h4>
+                <p>{{ bio.achievements }}</p>
+            {% endif %}
+
+            {% if bio.education %}
+                <h4>Образование</h4>
+                <p>{{ bio.education }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

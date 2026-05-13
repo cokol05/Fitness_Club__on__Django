@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Расписание тренировок{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-4">Расписание тренировок</h1>
+
+    <!-- Фильтры -->
+    <form method="get" class="row mb-4 justify-content-center" id="filterForm">
+        <div class="col-md-4">
+            <select name="difficulty" class="form-select">
+                <option value="">Все сложности</option>
+                {% for value, label in difficulty_choices %}
+                    <option value="{{ value }}" {% if selected_difficulty == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Применить фильтр</button>
+        </div>
+    </form>
+
+    <!-- Расписание -->
+    <div class="schedule-grid">
+        <div class="grid-header">
+            <div class="time-column">Время</div>
+            {% for day in week_days %}
+                <div class="day-column">
+                    <div class="day-name">{{ day.name }}</div>
+                    <div class="day-date">{{ day.date|date:"d.m" }}</div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% for hour in time_slots %}
+            <div class="grid-row">
+                <div class="time-column">{{ hour }}:00</div>
+                {% for day in week_days %}
+                    <div class="workout-cell">
+                        {% for schedule in schedules %}
+                            {% if schedule.start_time|date:"H" == hour|stringformat:"d" and schedule.date|date:"Y-m-d" == day.date|date:"Y-m-d" %}
+                                <div class="workout-card" data-status="{{ schedule.status_display }}">
+                                    <div class="workout-time">{{ schedule.start_time|time:"H:i" }} - {{ schedule.end_time|time:"H:i" }}</div>
+                                    <a href="{% url 'main:workout_detail' schedule.workout.pk %}" class="workout-name-link">
+                                        <div class="workout-name">{{ schedule.workout.name }}</div>
+                                    </a>
+                                    <div class="workout-trainer">{{ schedule.workout.trainer.full_name|default:"-" }}</div>
+                                    <div class="workout-places">
+                                        <!-- Проверяем статус и показываем нужную кнопку -->
+                                        {% if schedule.status_display == 'completed' %}
+                                            <span class="badge bg-secondary">Тренировка завершена</span>
+                                        {% elif schedule.status_display == 'in_progress' %}
+                                            <span class="badge bg-warning text-dark">Идет сейчас</span>
+                                        {% else %}
+                                            <!-- schedule.status_display == 'available' -->
+                                            {% if schedule.available_places > 0 %}
+                                                <span class="badge bg-success">{{ schedule.available_places }} мест</span>
+                                                {% if user.is_authenticated %}
+                                                    {% if user.has_active_tariff %}
+                                                        <a href="{% url 'main:book_workout' schedule.id %}" class="btn btn-sm btn-primary mt-2">Записаться</a>
+                                                    {% else %}
+                                                        <a href="{% url 'main:tariff_list' %}" class="btn btn-sm btn-warning mt-2">Нужен тариф</a>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <a href="{% url 'users:login' %}" class="btn btn-sm btn-secondary mt-2">Войдите</a>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="badge bg-danger">Мест нет</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                    <!-- Для отладки - показываем статус (убрать после проверки) -->
+
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.schedule-grid {
+    background: #1a1a1a;
+    border-radius: 15px;
+    overflow-x: auto;
+}
+
+.grid-header {
+    display: grid;
+    grid-template-columns: 100px repeat(7, 1fr);
+    background: #2a2a2a;
+    border-bottom: 2px solid #7bed9f;
+}
+
+.time-column {
+    padding: 15px;
+    font-weight: bold;
+    text-align: center;
+    border-right: 1px solid #3a3a3a;
+    background: #2a2a2a;
+}
+
+.day-column {
+    padding: 15px;
+    text-align: center;
+}
+
+.day-name {
+    font-weight: bold;
+    color: #7bed9f;
+}
+
+.day-date {
+    font-size: 12px;
+    color: #888;
+}
+
+.grid-row {
+    display: grid;
+    grid-template-columns: 100px repeat(7, 1fr);
+    border-bottom: 1px solid #3a3a3a;
+}
+
+.grid-row:hover {
+    background: #222;
+}
+
+.workout-cell {
+    min-height: 100px;
+    padding: 8px;
+    border-right: 1px solid #3a3a3a;
+    vertical-align: top;
+}
+
+.workout-card {
+    background: #2a2a2a;
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 5px;
+    font-size: 12px;
+    transition: transform 0.2s;
+}
+
+.workout-card[data-status="available"]:hover {
+    transform: scale(1.02);
+    background: #333;
+}
+
+.workout-card[data-status="in_progress"] {
+    background: #3a2a1a;
+    border: 1px solid #ffc107;
+}
+
+.workout-card[data-status="completed"] {
+    opacity: 0.6;
+    background: #1a1a1a;
+}
+
+.workout-card[data-status="completed"]:hover {
+    transform: none;
+}
+
+.workout-time {
+    color: #7bed9f;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.workout-name-link {
+    text-decoration: none;
+}
+
+.workout-name {
+    font-weight: bold;
+    margin: 5px 0;
+    color: #fff;
+    transition: color 0.2s;
+}
+
+.workout-name-link:hover .workout-name {
+    color: #ffb8c6;
+    text-decoration: underline;
+}
+
+.workout-trainer {
+    color: #ffb8c6;
+    font-size: 10px;
+}
+
+.btn-sm {
+    font-size: 11px;
+    padding: 3px 8px;
+}
+
+.workout-card[data-status="in_progress"] .workout-time {
+    color: #ffc107;
+}
+
+@media (max-width: 768px) {
+    .grid-header, .grid-row {
+        font-size: 10px;
+    }
+    .time-column {
+        width: 60px;
+    }
+}
+</style>
+
+<script>
+// Добавим отладку в консоль браузера
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.workout-card');
+    cards.forEach(card => {
+        const status = card.getAttribute('data-status');
+        console.log('Тренировка со статусом:', status);
+    });
+});
+</script>
+{% endblock %}

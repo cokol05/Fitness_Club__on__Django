@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Тарифы и абонементы{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-5">Наши тарифы</h1>
+
+    <div class="row">
+        {% for tariff in tariffs %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">{{ tariff.name }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        {% with discount=tariff.get_discount_percent %}
+                            {% if discount > 0 %}
+                                <span class="text-muted"><s>{{ tariff.price }} ₽</s></span>
+                                <span class="display-4 fw-bold text-success">{{ tariff.get_current_price }} ₽</span>
+                                <span class="badge bg-danger">-{{ discount }}%</span>
+                            {% else %}
+                                <span class="display-4 fw-bold">{{ tariff.price }} ₽</span>
+                            {% endif %}
+                        {% endwith %}
+                        <p class="text-muted mb-0">на {{ tariff.duration_days }}
+                            {% if tariff.duration_days == 1 %}день
+                            {% elif tariff.duration_days <= 4 %}дня
+                            {% else %}дней
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <!-- Акции -->
+                    {% with active_promotions=tariff.promotions.all %}
+                        {% if active_promotions %}
+                            <div class="alert alert-success py-1">
+                                <small>
+                                    <i class="fas fa-tag"></i>
+                                    {% for promo in active_promotions %}
+                                        {{ promo.name }} (-{{ promo.discount_percent }}%)
+                                        {% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                </small>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+
+                    <hr>
+
+                    <div class="text-start">
+                        <strong class="d-block mb-2">Что включено:</strong>
+                        <ul class="list-unstyled">
+                            {% if tariff.has_personal_trainings %}
+                                <li><i class="fas fa-check-circle text-success"></i> 🧘 Доступ к персональным тренировкам</li>
+                            {% endif %}
+                            {% if tariff.has_unlimited %}
+                                <li><i class="fas fa-check-circle text-success"></i> ♾️ Безлимитное посещение</li>
+                            {% endif %}
+                            {% if tariff.has_day_time %}
+                                <li><i class="fas fa-check-circle text-success"></i> ☀️ Посещение днем (до 17:00)</li>
+                            {% endif %}
+                            {% if tariff.has_evening_time %}
+                                <li><i class="fas fa-check-circle text-success"></i> 🌙 Посещение вечером (после 17:00)</li>
+                            {% endif %}
+                            {% if tariff.has_free_parking %}
+                                <li><i class="fas fa-check-circle text-success"></i> 🅿️ Бесплатная парковка</li>
+                            {% endif %}
+                            {% if tariff.has_personal_locker %}
+                                <li><i class="fas fa-check-circle text-success"></i> 🔒 Собственный шкафчик</li>
+                            {% endif %}
+                            {% if tariff.has_fitness_testing %}
+                                <li><i class="fas fa-check-circle text-success"></i> 📊 Анализ состава тела In Body</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pb-3">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'users:buy_tariff' tariff.id %}" class="btn btn-primary w-100 py-2">
+                            <i class="fas fa-shopping-cart"></i> Выбрать тариф
+                        </a>
+                    {% else %}
+                        <a href="{% url 'users:login' %}" class="btn btn-primary w-100 py-2">
+                            <i class="fas fa-sign-in-alt"></i> Войдите, чтобы купить
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle"></i> Тарифы скоро появятся.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

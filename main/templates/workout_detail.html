@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ workout.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-6">
+            {% if workout.image %}
+                <img src="{{ workout.image.url }}" class="img-fluid rounded" alt="{{ workout.name }}" style="border-radius: 15px;">
+            {% else %}
+                <div class="bg-secondary text-white rounded d-flex align-items-center justify-content-center" style="height: 300px;">
+                    <i class="fas fa-dumbbell fa-8x"></i>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <h1>{{ workout.name }}</h1>
+            <p><strong>Длительность:</strong> {{ workout.duration_minutes }} минут</p>
+            <p><strong>Сложность:</strong> {{ workout.get_difficulty_display }}</p>
+            <p><strong>Цели:</strong> {{ workout.goals }}</p>
+            <p><strong>Максимум участников:</strong> {{ workout.max_participants }}</p>
+            {% if workout.trainer %}
+                <p><strong>Тренер:</strong> {{ workout.trainer.full_name }}</p>
+            {% else %}
+                <p><strong>Тренер:</strong> Не назначен</p>
+            {% endif %}
+
+            <hr>
+
+            <h4>Описание</h4>
+            <p>{{ workout.description }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
