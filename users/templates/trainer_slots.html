@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Слоты {{ trainer.full_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-4">{{ trainer.full_name }}</h1>
+
+    <div class="row">
+        {% for slot in slots %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3>{{ slot.date|date:"d.m.Y" }}</h3>
+                    <p class="lead">{{ slot.start_time|time:"H:i" }} - {{ slot.end_time|time:"H:i" }}</p>
+                    <a href="{% url 'users:book_personal' slot.id %}" class="btn btn-success">Записаться</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-warning text-center">
+                <p>У тренера пока нет свободных слотов</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

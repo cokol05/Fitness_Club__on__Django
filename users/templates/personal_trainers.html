@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Персональные тренировки{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-5">Наши тренеры</h1>
+
+    <div class="row">
+        {% for bio in trainers %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center">
+                {% if bio.photo %}
+                    <img src="{{ bio.photo.url }}" class="card-img-top" alt="{{ bio.trainer.full_name }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="fas fa-user fa-5x"></i>
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <h4>{{ bio.trainer.full_name }}</h4>
+                    <p class="text-muted">{{ bio.specialty }}</p>
+                    <p>⭐ Стаж: {{ bio.experience_years }} лет</p>
+                    <p>📞 {{ bio.trainer.phone }}</p>
+                    <a href="{% url 'users:trainer_slots' bio.trainer.id %}" class="btn btn-primary">Выбрать время</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <p>Тренеры пока не добавлены</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

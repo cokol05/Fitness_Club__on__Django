@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Мой профиль{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Меню</h4>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'users:profile' %}" class="list-group-item list-group-item-action active">Профиль</a>
+                    <a href="{% url 'users:edit_profile' %}" class="list-group-item list-group-item-action">Редактировать профиль</a>
+                    <a href="{% url 'users:password_change' %}" class="list-group-item list-group-item-action">Сменить пароль</a>
+                    <a href="{% url 'main:tariff_list' %}" class="list-group-item list-group-item-action">Купить тариф</a>
+                    <a href="{% url 'users:personal_trainers' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-chalkboard-user"></i> Персональные тренировки
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Информация о пользователе</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>ФИО:</strong> {{ user.full_name }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Телефон:</strong> {{ user.phone|default:"Не указан" }}</p>
+                    <p><strong>Дата рождения:</strong> {{ user.birth_date|default:"Не указана" }}</p>
+
+                    <hr>
+
+                    <h5>Мой тариф</h5>
+                    {% if tariff_active %}
+                        <div class="bg-success p-3 rounded" style="background-color: #28a745 !important;">
+                            <strong style="color: white;">Тариф: {{ user.tariff_name }}</strong><br>
+                            <span style="color: white;">Действует до: {{ user.tariff_end_date|date:"d.m.Y" }}</span><br>
+                            {% if user.tariff_type == 'day' %}
+                                <span style="color: white;">⏰ Дневной (до 17:00)</span>
+                            {% elif user.tariff_type == 'evening' %}
+                                <span style="color: white;">🌙 Вечерний (после 17:00)</span>
+                            {% else %}
+                                <span style="color: white;">♾️ Безлимитный</span>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="bg-warning p-3 rounded">
+                            Нет активного тарифа.
+                            <a href="{% url 'main:tariff_list' %}">Купить тариф</a>
+                        </div>
+                    {% endif %}
+
+                    <hr>
+
+                    <h5>Мои групповые тренировки</h5>
+                    {% if bookings %}
+                        <ul class="list-group">
+                            {% for booking in bookings %}
+                                {% if booking.schedule.status == 'active' %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>{{ booking.schedule.workout.name }}</strong><br>
+                                            {{ booking.schedule.date|date:"d.m.Y" }} {{ booking.schedule.start_time|time:"H:i" }}
+                                        </div>
+                                        <a href="{% url 'main:cancel_booking' booking.id %}" class="btn btn-danger btn-sm">Отменить</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">Нет активных записей на групповые тренировки</p>
+                    {% endif %}
+
+                    <hr>
+
+                    <h5>Мои персональные тренировки</h5>
+                    {% if user.personal_trainings_as_client.all %}
+                        <ul class="list-group">
+                            {% for pt in user.personal_trainings_as_client.all %}
+                                {% if pt.status == 'booked' and pt.date >= now %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>Персональная тренировка</strong><br>
+                                            Тренер: {{ pt.trainer.full_name }}<br>
+                                            {{ pt.date|date:"d.m.Y" }} {{ pt.start_time|time:"H:i" }}
+                                        </div>
+                                        <a href="{% url 'users:cancel_personal' pt.id %}" class="btn btn-danger btn-sm">Отменить</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">Нет активных записей на персональные тренировки</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

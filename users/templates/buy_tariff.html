@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Покупка тарифа{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Покупка тарифа "{{ tariff.name }}"</h3>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        {% with discount=tariff.get_discount_percent %}
+                            {% if discount > 0 %}
+                                <span class="text-muted"><s>{{ tariff.price }} ₽</s></span>
+                                <h2 class="display-4 text-success">{{ tariff.get_current_price }} ₽</h2>
+                                <span class="badge bg-danger">Скидка {{ discount }}%</span>
+                            {% else %}
+                                <h2 class="display-4">{{ tariff.price }} ₽</h2>
+                            {% endif %}
+                        {% endwith %}
+                        <p class="text-muted">на {{ tariff.duration_days }} дней</p>
+                    </div>
+
+                    <hr>
+
+                    <h5>В тариф входит:</h5>
+                    <ul class="list-unstyled">
+                        {% if tariff.has_personal_trainings %}
+                            <li><i class="fas fa-check-circle text-success"></i> 🧘 Доступ к персональным тренировкам</li>
+                        {% endif %}
+                        {% if tariff.has_unlimited %}
+                            <li><i class="fas fa-check-circle text-success"></i> ♾️ Безлимитное посещение</li>
+                        {% endif %}
+                        {% if tariff.has_day_time %}
+                            <li><i class="fas fa-check-circle text-success"></i> ☀️ Посещение днем (до 17:00)</li>
+                        {% endif %}
+                        {% if tariff.has_evening_time %}
+                            <li><i class="fas fa-check-circle text-success"></i> 🌙 Посещение вечером (после 17:00)</li>
+                        {% endif %}
+                        {% if tariff.has_free_parking %}
+                            <li><i class="fas fa-check-circle text-success"></i> 🅿️ Бесплатная парковка</li>
+                        {% endif %}
+                        {% if tariff.has_personal_locker %}
+                            <li><i class="fas fa-check-circle text-success"></i> 🔒 Собственный шкафчик</li>
+                        {% endif %}
+                        {% if tariff.has_fitness_testing %}
+                            <li><i class="fas fa-check-circle text-success"></i> 📊 Анализ состава тела In Body</li>
+                        {% endif %}
+                    </ul>
+
+                    <hr>
+
+                    <!-- Акции на этом тарифе -->
+                    {% with active_promotions=tariff.promotions.all %}
+                        {% if active_promotions %}
+                            <div class="alert alert-success mb-3">
+                                <i class="fas fa-tag"></i>
+                                {% for promo in active_promotions %}
+                                    <strong>{{ promo.name }}</strong> (-{{ promo.discount_percent }}%)
+                                    {% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> После оплаты тариф будет активирован
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 py-2">
+                            <i class="fas fa-credit-card"></i> Оплатить {{ tariff.get_current_price }} ₽
+                        </button>
+                        <a href="{% url 'main:tariff_list' %}" class="btn btn-secondary w-100 mt-2">Отмена</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

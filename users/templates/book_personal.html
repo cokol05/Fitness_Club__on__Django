@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Подтверждение записи{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Подтверждение записи</h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>Тренер:</strong> {{ slot.trainer.full_name }}</p>
+                    <p><strong>Дата:</strong> {{ slot.date|date:"d.m.Y" }}</p>
+                    <p><strong>Время:</strong> {{ slot.start_time|time:"H:i" }} - {{ slot.end_time|time:"H:i" }}</p>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100">Подтвердить запись</button>
+                        <a href="{% url 'users:trainer_slots' slot.trainer.id %}" class="btn btn-secondary w-100 mt-2">Назад</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
