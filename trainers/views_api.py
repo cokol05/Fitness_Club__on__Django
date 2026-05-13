@@ -25,7 +25,7 @@ def api_root(request):
 @permission_classes([IsAuthenticated])
 def trainer_slots(request):
 
-    # Проверка, что пользователь - тренер
+
     if not request.user.is_trainer:
         return Response(
             {"error": "Только тренеры могут управлять слотами"},
@@ -91,19 +91,18 @@ def available_slots(request, trainer_id):
 def book_slot(request, slot_id):
     slot = get_object_or_404(PersonalTraining, id=slot_id, status='available')
 
-    # Проверка, что пользователь не тренер
+  
     if request.user.is_trainer:
         return Response(
             {"error": "Тренеры не могут записываться на персональные тренировки как клиенты"},
             status=status.HTTP_403_FORBIDDEN)
 
-    # Проверка, что пользователь не записывается к себе
     if slot.trainer == request.user:
         return Response(
             {"error": "Нельзя записаться на тренировку к себе"},
             status=status.HTTP_400_BAD_REQUEST)
 
-    # Проверка, есть ли у пользователя доступ к персональным тренировкам по тарифу
+    
     if not request.user.tariff_has_personal:
         return Response(
             {"error": "Ваш тариф не включает персональные тренировки"},
